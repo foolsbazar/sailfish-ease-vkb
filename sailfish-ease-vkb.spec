@@ -11,7 +11,9 @@ Requires: 	jolla-keyboard == 0.7.2
 
 %description 	
 The amazing messagease keyboard ported by Jimmy Huguet on SailfishOS.
-This is a very special keyboard that perfectly combines the usual typing experience with few other swipe gestures that allows you to get rid of all your classical typos.
+This is a very special keyboard that perfectly combines the usual typing
+experience with few other swipe gestures that allows you to get rid of
+all your classical typos.
 
 %install
 rm -rf %{buildroot}
@@ -41,6 +43,7 @@ systemctl-user restart maliit-server.service
 %{_datadir}/maliit/plugins/com/jolla/layouts/ease_en.qml
 %{_datadir}/maliit/plugins/com/jolla/layouts/ease_es.qml
 %{_datadir}/maliit/plugins/com/jolla/layouts/ease_it.qml
+%{_datadir}/maliit/plugins/com/jolla/layouts/ease_nl.qml
 %{_datadir}/maliit/plugins/com/jolla/layouts/ease_noNN.qml
 %{_datadir}/maliit/plugins/com/jolla/layouts/ease_pl.qml
 %{_datadir}/maliit/plugins/com/jolla/layouts/ease_zh_cn_pinyin.qml
