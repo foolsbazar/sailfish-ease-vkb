@@ -1,13 +1,13 @@
 Name: 		sailfish-ease-vkb
 Version: 	1.0.2
-Release: 	6
+Release: 	7
 Summary: 	The amazing messagease keyboard
 License: 	GPLv3+
-URL: 		http://www.openrepos.net
-Source0:        https://github.com/foolsbazar/sailfish-ease-vkb
+URL: 		  https://openrepos.net/content/foolsbazar/sailfishease-keyboard-fork
+Source0:  https://github.com/foolsbazar/sailfish-ease-vkb
 Group:		System/Tools
 BuildArch: 	noarch
-Requires: 	jolla-keyboard == 0.7.2
+Requires: 	jolla-keyboard >= 0.7.2 
 
 %description 	
 The amazing messagease keyboard ported by Jimmy Huguet on SailfishOS.
