@@ -459,7 +459,7 @@ Item {
                     inputKey.text = lastAccentMerge
                     keyboard.inputHandler._handleKeyClick(inputKey)
                     lastAccentMerge = ""
-                } else if (key.key === Qt.Key_Return)
+                } else if (key.key === Qt.Key_Return || key.key === Qt.Key_Space)
                     lastAccentMerge = ""
             }
             key.clicked()
