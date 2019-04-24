@@ -1,6 +1,6 @@
 Name: 		sailfish-ease-vkb
 Version: 	1.0.2
-Release: 	7
+Release: 	8
 Summary: 	The amazing messagease keyboard
 License: 	GPLv3+
 URL: 		  https://openrepos.net/content/foolsbazar/sailfishease-keyboard-fork
