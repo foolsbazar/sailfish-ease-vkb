@@ -40,10 +40,26 @@ FunctionKey {
 
     separator: false
 
-    caption: attributes.inSymView ? "0" : ""
-    text: caption
+    caption: ""
+    text: attributes.inSymView ? "0" : ""
     implicitWidth: functionKeyWidth
     keyType: KeyType.SymbolKey
+    states: [
+        State {
+            name: "simView"
+            when: attributes.inSymView
+            PropertyChanges {
+                target: symbolKey
+                background.opacity: 0
+            }
+            PropertyChanges {
+                target: textItem
+                font.pixelSize: Theme.fontSizeExtraLarge
+                text: symbolKey.text
+
+            }
+        }
+    ]
     //swipeHighlightEnable: attributes.inSymView
     property alias label: textItem.text
 
@@ -68,7 +84,7 @@ FunctionKey {
         font.family: Theme.fontFamily
         color: parent.pressed ? Theme.highlightColor : Theme.primaryColor
         text: "*.$"
-        visible: !attributes.inSymView
+        //visible: !attributes.inSymView
     }
 
     onClicked: {
