@@ -46,6 +46,7 @@ systemctl-user restart maliit-server.service
 %{_datadir}/maliit/plugins/com/jolla/layouts/ease_nl.qml
 %{_datadir}/maliit/plugins/com/jolla/layouts/ease_noNN.qml
 %{_datadir}/maliit/plugins/com/jolla/layouts/ease_pl.qml
+%{_datadir}/maliit/plugins/com/jolla/layouts/ease_sv.qml
 %{_datadir}/maliit/plugins/com/jolla/layouts/ease_zh_cn_pinyin.qml
 %{_datadir}/maliit/plugins/com/jolla/layouts/layouts_ease.conf
 %{_datadir}/icons/hicolor/256x256/apps/%{name}.png
