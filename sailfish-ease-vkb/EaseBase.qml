@@ -31,13 +31,13 @@ import QtQuick 2.0
 import com.jolla.keyboard 1.0
 import Sailfish.Silica 1.0
 import ".."
+
 KeyboardEaseLayout {
     id: mylay
     splitSupported: false
     useTopItem: !mylay.isLandscape
-    height: isLandscape ? 3*rowHeight + parent.width/7/2 :
-                          topItemOffset + 3*rowHeight + parent.width/4/1.75
-    property real rowHeight: isLandscape ? 0.75 * parent.width/7 : 0.75 * parent.width/4
+    height: 500
+    property real rowHeight: isLandscape ? 0.8 * parent.width/7 : 0.75 * parent.width/4
 
     accentMap: {
             "a": {"´": "á", "^": "â", "¨": "ä", "`": "à", "°": "å", "~": "ã"},
@@ -65,9 +65,8 @@ KeyboardEaseLayout {
 
     KeyboardEaseRow {
         id:row1
-        y: topItemOffset
         height: rowHeight
-        CharacterEaseKey {keyValue: easeLayout["topLeft"];}
+        CharacterEaseKey {keyValue: easeLayout["topLeft"]}
         CharacterEaseKey {keyValue: easeLayout["top"] }
         CharacterEaseKey {keyValue: easeLayout["topRight"]}
 
@@ -89,66 +88,27 @@ KeyboardEaseLayout {
     }
     KeyboardEaseRow {
         id:row2
-        y: row1.y + rowHeight
         height: rowHeight
         CharacterEaseKey {keyValue: easeLayout["left"] }
-        CharacterEaseKey {keyValue: easeLayout["center"]
-            EaseSeparator {
-                model: ListModel{
-                    ListElement{horizontal: "right"; vertical:"top"}
-                    ListElement{horizontal: "right"; vertical:"bottom"}
-                    ListElement{horizontal: "left"; vertical:"top"}
-                    ListElement{horizontal: "left"; vertical:"bottom"}
-                }
-                angles: [ 0, 90, 180, 270]
-            }
-        }
+        CharacterEaseKey {keyValue: easeLayout["center"]; showSeparator: true}
         CharacterEaseKey {keyValue: easeLayout["right"] }
 
         SymbolKey    { height:parent.height; active: mylay.isLandscape; caption: symbol.caption}
         ShiftEaseKey { height:parent.height; implicitWidth: symbol.width;   active: !mylay.isLandscape }
 
         CharacterEaseKey {keyValue: easeLayout["left"];   active: mylay.isLandscape }
-        CharacterEaseKey {keyValue: easeLayout["center"]; active: mylay.isLandscape;
-            EaseSeparator {
-                model: ListModel{
-                    ListElement{horizontal: "right"; vertical:"top"}
-                    ListElement{horizontal: "right"; vertical:"bottom"}
-                    ListElement{horizontal: "left"; vertical:"top"}
-                    ListElement{horizontal: "left"; vertical:"bottom"}
-                }
-                angles: [ 0, 90, 180, 270]
-            }
-        }
+        CharacterEaseKey {keyValue: easeLayout["center"]; active: mylay.isLandscape; showSeparator: true}
         CharacterEaseKey {keyValue: easeLayout["right"];  active: mylay.isLandscape }
     }
     KeyboardEaseRow {
         id:row3
-        y: row2.y + rowHeight
         height: rowHeight
         CharacterEaseKey {keyValue: easeLayout["bottomLeft"]}
-        CharacterEaseKey {keyValue: easeLayout["bottom"]
-            EaseSeparator {
-                showSeparator: attributes.inSymView && !mylay.isLandscape
-                model:ListModel{
-                    ListElement{horizontal: "left"; vertical:"bottom"}
-                }
-                angles: [ 0, 90, 180, 270]
-            }
-        }
+        CharacterEaseKey {keyValue: easeLayout["bottom"] }
         CharacterEaseKey {keyValue: easeLayout["bottomRight"]}
 
         SymbolKey      {height:parent.height; id: symbol; active: !mylay.isLandscape }
-        SpecialEaseKey {height:parent.height; id: special; active: mylay.isLandscape; implicitWidth: symbol.width
-            EaseSeparator {
-                showSeparator: attributes.inSymView
-                model:ListModel{
-                    ListElement{horizontal: "right"; vertical:"top"}
-                    ListElement{horizontal: "left"; vertical:"top"}
-                }
-                angles: [ 0, 90, 180, 270]
-            }
-        }
+        SpecialEaseKey {height:parent.height; id: special; active: mylay.isLandscape; implicitWidth: symbol.width}
 
 
         CharacterEaseKey {keyValue: easeLayout["bottomLeft"];  active: mylay.isLandscape}
@@ -157,11 +117,10 @@ KeyboardEaseLayout {
     } 
     KeyboardEaseRow {
         id:row4
-        y: row3.y + rowHeight
         height: parent.width/4/1.75
         splitIndex: 3
         visible: portraitMode
-        SpecialEaseKey { height:parent.height; label: special.label;}
+        SpecialEaseKey { height:parent.height; label: special.label}
 
         SpacebarKey { height:parent.height }
         EnterKey {height:parent.height; }
@@ -169,7 +128,6 @@ KeyboardEaseLayout {
 
     KeyboardEaseRow {
         id: landscapeBottomRow
-        y: row3.y + rowHeight
         height: parent.width/7/2
         visible:!portraitMode
 

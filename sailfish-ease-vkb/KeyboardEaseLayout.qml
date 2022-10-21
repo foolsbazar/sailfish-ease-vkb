@@ -10,32 +10,8 @@ import org.nemomobile.systemsettings 1.0
 import "../touchpointarray.js" as ActivePoints2
 import ".."
 
-Item {
+KeyboardLayout {
     id: keyboardLayout
-    width: parent ? parent.width : 0
-
-    property string type
-    property bool portraitMode
-    property int rowHeight
-    property int keyHeight
-    property int punctuationKeyWidth
-    property int punctuationKeyWidthNarrow
-    property int shiftKeyWidth
-    property int functionKeyWidth
-    property int shiftKeyWidthNarrow
-    property int symbolKeyWidthNarrow
-    property QtObject attributes: visible ? keyboard : keyboard.nextLayoutAttributes
-    property string languageCode
-    property string inputMode
-    property int avoidanceWidth
-    property bool splitActive
-    property bool splitSupported
-    property bool useTopItem: !splitActive
-    property bool capsLockSupported: true
-    property int layoutIndex: -1
-    property bool allowSwipeGesture: true
-
-    property real topItemOffset: isLandscape || !useTopItem ? 0 : Theme.itemSizeSmall
 
     property bool isLandscape
     property bool isEase: true
@@ -43,16 +19,11 @@ Item {
     property string lastAccentMerge: ""
     property string lastCommited: ""
 
-    signal flashLanguageIndicator()
-
     Component.onCompleted: {
         if (!componentSearchCompleted)
             searchParentsChild()
-        updateSizes()
     }
-    onWidthChanged: updateSizes()
     onPortraitModeChanged: {
-        updateSizes()
         cancelAllTouchPoints()
     }
     onVisibleChanged: if (!componentSearchCompleted) searchParentsChild()
@@ -62,18 +33,23 @@ Item {
         key: "/sailfish/text_input/use_mouse_events"
         defaultValue: false
     }
+
     property Item languageSelectionItem
     property Item childToBeDisabled
     property bool componentSearchCompleted: false
     function searchParentsChild(){
+     console.info(keyboard)
         // Hack to find child MultiPointTouchArea of KeybardBase{}
         var multiPointTouchArea_idx = -1
         var languageSelectionPopup_idx = -1
         for (var i=0; i<keyboard.children.length; ++i){
+
          // seaching for the child 'MultiPointTouchArea' by looking at all the properties a MultiPointTouchArea has
          if ( (keyboard.children[i].maximumTouchPoints !== undefined) && (keyboard.children[i].minimumTouchPoints !== undefined) &&
-                    (keyboard.children[i].mouseEnabled !== undefined) && (keyboard.children[i].touchPoints !== undefined))
+                    (keyboard.children[i].mouseEnabled !== undefined) && (keyboard.children[i].touchPoints !== undefined)) {
+                    console.info(keyboard.children[i])
              multiPointTouchArea_idx = i;
+                    }
          // seaching for the child 'LanguageSelectionPopup'
          if ( (keyboard.children[i].activeCell !== undefined) && (keyboard.children[i].inInitialPosition !== undefined) &&
                     (keyboard.children[i].pointId !== undefined) && (keyboard.children[i].opening !== undefined))
@@ -83,8 +59,11 @@ Item {
         if (multiPointTouchArea_idx !== -1) childToBeDisabled = keyboard.children[multiPointTouchArea_idx]
         if (multiPointTouchArea_idx !== -1 && languageSelectionPopup_idx !== -1){
             componentSearchCompleted = true
+            console.info(childToBeDisabled)
+            console.info(languageSelectionItem)
             console.info('Conponents research executed')
         }
+        
     }
     states: State {
         name: "disableOriginalTouchpointArea"
@@ -92,6 +71,10 @@ Item {
         PropertyChanges {
             target: childToBeDisabled
             enabled: keyboard.layout.isEase === undefined
+        }
+        PropertyChanges {
+            target: keyboard
+            interactive: keyboard.layout.isEase === undefined
         }
     }
     Timer {
@@ -119,6 +102,8 @@ Item {
     }
     MultiPointTouchArea {
         id:personalMultiPointTouchArea
+        parent: keyboardLayout.parent
+        z: keyboardLayout.z + 1
         anchors.fill: parent
         enabled: keyboardLayout.visible && !useMouseEvents.value && keyboardLayout.componentSearchCompleted
 
@@ -182,7 +167,7 @@ Item {
                 keyboard.silenceFeedback = false
             }
 
-            if (!keyboard.gestureInProgress && !layoutRow.transitionRunning) {
+            if (!keyboard.gestureInProgress && !keyboard.transitionRunning) {
 
                 if (key !== null && key.tempPoint !== undefined) {
                     key.currentPoint = Qt.point(point.x - (point.startX - key.startPoint.x) , point.y - (point.startY - key.startPoint.y))
@@ -425,7 +410,7 @@ Item {
         keyType: KeyType.PopupKey
     }
     function triggerKey(key) {
-        if (!keyboard.gestureInProgress && !layoutRow.transitionRunning) {
+        if (!keyboard.gestureInProgress && !keyboard.transitionRunning) {
             if (key.keyType !== KeyType.DeadKey) {
                 if (key.keyType === KeyType.CharacterKey && key.tempPoint !== undefined) {
                     inputKey.text=key.text
@@ -471,116 +456,6 @@ Item {
             key.swipeValue = -1
             key.startPoint = Qt.point(0,0)
             key.currentPoint = Qt.point(0,0)
-        }
-    }
-
-    Connections {
-        target: keyboard
-        onSplitEnabledChanged: updateSizes()
-        onGestureInProgressChanged: {
-            if (keyboard.gestureInProgress) {
-                keyboard.inputHandler._handleKeyRelease()
-                keyboard.lastPressedKey = null
-                pressTimer.stop()
-                languageSwitchTimer.stop()
-            }
-        }
-    }
-    Connections {
-        target: layoutRow
-        onTransitionRunningChanged:{
-            if (layoutRow.transitionRunning) {
-                keyboard.inputHandler._handleKeyRelease()
-                keyboard.lastPressedKey = null
-                pressTimer.stop()
-                languageSwitchTimer.stop()
-            }
-        }
-    }
-
-    Binding on portraitMode {
-        when: MInputMethodQuick.active
-        value: keyboard.portraitMode
-    }
-
-    Loader {
-        // Expose "keyboardLayout" to the context of the loaded TopItem
-        readonly property Item keyboardLayout: keyboardLayout
-
-        active: useTopItem && (layoutIndex >= 0)
-        // sourceComponent is evaluated even when active is false, so we need the ternary operator here
-        sourceComponent: active ? keyboard.getInputHandler(keyboardLayout).topItem : null
-        width: parent.width
-        visible: active
-        clip: keyboard.transitionRunning
-        asynchronous: false
-        opacity: (canvas.activeIndex === keyboardLayout.layoutIndex) ? 1.0 : 0.0
-        Behavior on opacity { FadeAnimator {}}
-    }
-
-    function updateSizes () {
-        if (width === 0) {
-            return
-        }
-
-        if (portraitMode) {
-            isLandscape = false
-            //keyHeight = width * 0.75 / 4
-            //keyHeight = geometry.keyHeightPortrait
-            punctuationKeyWidth = geometry.punctuationKeyPortait
-            punctuationKeyWidthNarrow = geometry.punctuationKeyPortraitNarrow
-            shiftKeyWidth = geometry.shiftKeyWidthPortrait
-            functionKeyWidth = geometry.functionKeyWidthPortrait
-            shiftKeyWidthNarrow = geometry.shiftKeyWidthPortraitNarrow
-            symbolKeyWidthNarrow = geometry.symbolKeyWidthPortraitNarrow
-            avoidanceWidth = 0
-            splitActive = false
-        } else {
-            isLandscape = true
-            //rowHeight = (1+offset) * keyHeight
-            //keyHeight = width * 0.32 / 4
-            //keyHeight = geometry.keyHeightLandscape
-            punctuationKeyWidth = geometry.punctuationKeyLandscape
-            punctuationKeyWidthNarrow = geometry.punctuationKeyLandscapeNarrow
-            functionKeyWidth = geometry.functionKeyWidthLandscape
-
-            var shouldSplit = keyboard.splitEnabled && splitSupported
-            if (shouldSplit) {
-                avoidanceWidth = geometry.middleBarWidth
-                shiftKeyWidth = geometry.shiftKeyWidthLandscapeSplit
-                shiftKeyWidthNarrow = geometry.shiftKeyWidthLandscapeSplit
-                symbolKeyWidthNarrow = geometry.symbolKeyWidthLandscapeNarrowSplit
-            } else {
-                avoidanceWidth = 0
-                shiftKeyWidth = geometry.shiftKeyWidthLandscape
-                shiftKeyWidthNarrow = geometry.shiftKeyWidthLandscapeNarrow
-                symbolKeyWidthNarrow = geometry.symbolKeyWidthLandscapeNarrow
-            }
-            splitActive = shouldSplit
-        }
-
-        var i
-        var child
-        var maxButton = width
-
-        for (i = 0; i < children.length; ++i) {
-            child = children[i]
-            child.width = width
-//            if (child.hasOwnProperty("followRowHeight") && child.followRowHeight) {
-//                child.height = keyHeight
-//            }
-
-            if (child.maximumBasicButtonWidth !== undefined) {
-                maxButton = Math.min(child.maximumBasicButtonWidth(width), maxButton)
-            }
-        }
-
-        for (i = 0; i < children.length; ++i) {
-            child = children[i]
-
-            if (child.relayout !== undefined) {
-                child.relayout(maxButton)
-            }
         }
     }
 }
